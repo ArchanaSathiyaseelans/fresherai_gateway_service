@@ -17,31 +17,49 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin: "http://http://100.53.193.152:3000",
+    origin: process.env.FRONTEND_URL,
     credentials: true,
   }),
 );
+
 app.use(morgan("dev"));
 app.use(cookieParser());
 
 app.get("/", (req, res) => {
   return res.send(`hello from Server`);
 });
-app.use("/api/auth", proxy(process.env.AUTH_SERVICE_URL));
+app.use(
+  "/api/auth",
+  proxy(process.env.AUTH_SERVICE_URL || "http://3.218.20.238:8001"),
+);
 
 app.get("/api/me", isAuth, getCurrentUser);
 
 app.use(
   "/api/interview",
   isAuth,
-  proxyWithUser(process.env.INTERVIEW_SERVICE_URL),
+  proxyWithUser(
+    process.env.INTERVIEW_SERVICE_URL || "http://3.218.20.238:8002",
+  ),
 );
 
-app.use("/api/resume", isAuth, proxyWithUser(process.env.RESUME_SERVICE_URL));
+app.use(
+  "/api/resume",
+  isAuth,
+  proxyWithUser(process.env.RESUME_SERVICE_URL || "http://3.218.20.238:8003"),
+);
 
-app.use("/api/roadmap", isAuth, proxyWithUser(process.env.ROADMAP_SERVICE_URL));
+app.use(
+  "/api/roadmap",
+  isAuth,
+  proxyWithUser(process.env.ROADMAP_SERVICE_URL || "http://3.218.20.238:8004"),
+);
 
-app.use("/api/billing", isAuth, proxyWithUser(process.env.BILLING_SERVICE_URL));
+app.use(
+  "/api/billing",
+  isAuth,
+  proxyWithUser(process.env.BILLING_SERVICE_URL || "http://3.218.20.238:8005"),
+);
 
 app.listen(PORT, () => {
   console.log(`Gateway Started on ${PORT}`);
